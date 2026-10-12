@@ -1,6 +1,6 @@
-// Service worker : permet d'ouvrir l'appli hors connexion.
-// Change ce numéro à chaque mise à jour de l'appli pour forcer le rafraîchissement.
-const VERSION = 'olympe-v6';
+﻿// Service worker : permet d'ouvrir l'appli hors connexion.
+// Change ce numÃ©ro Ã  chaque mise Ã  jour de l'appli pour forcer le rafraÃ®chissement.
+const VERSION = 'olympe-v7';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
@@ -15,7 +15,7 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  // Page principale : réseau d'abord (pour avoir la dernière version), cache si hors connexion
+  // Page principale : rÃ©seau d'abord (pour avoir la derniÃ¨re version), cache si hors connexion
   if (req.mode === 'navigate') {
     e.respondWith(fetch(req, { cache: 'no-cache' }).then(r => { const copy = r.clone(); caches.open(VERSION).then(c => c.put('./index.html', copy)); return r; }).catch(() => caches.match('./index.html')));
     return;

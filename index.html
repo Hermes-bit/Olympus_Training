@@ -232,15 +232,38 @@ h3{font-size:1.05rem;letter-spacing:.03em}
 .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
 /* Panthéon */
-.gods{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
-.godc{position:relative;text-align:left;background:color-mix(in srgb,var(--surface) 90%,transparent);border:1.5px solid var(--line);border-radius:18px;padding:14px;cursor:pointer;display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:start;min-width:0}
-.godc .e{width:56px;color:var(--gc)}
-.godc h3{font-size:1.15rem;color:var(--gc)}
-.godc .ep{font-size:.78rem;color:var(--muted);font-style:italic}
-.godc p{margin:6px 0 0;font-size:.86rem;color:var(--muted);line-height:1.35}
-.godc .pr{font-size:.82rem;font-weight:600;margin-top:4px}
-.godc[aria-pressed="true"]{border-color:var(--gc);box-shadow:0 0 0 1px var(--gc) inset}
-.godc[aria-pressed="true"]::after{content:"Choisi";position:absolute;right:12px;top:12px;font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gc)}
+.glist{display:flex;flex-direction:column}
+.grow{border-top:1px solid var(--line)}
+.grow:first-child{border-top:none}
+.grow summary{list-style:none;display:grid;grid-template-columns:48px 1fr auto 18px;gap:14px;align-items:center;padding:12px 4px;cursor:pointer;border-radius:12px}
+.grow summary::-webkit-details-marker{display:none}
+.grow summary:hover{background:color-mix(in srgb,var(--gc) 6%,transparent)}
+.grow summary:focus-visible{outline:2px solid var(--gc);outline-offset:2px}
+.grow .e{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:var(--gc);background:color-mix(in srgb,var(--gc) 10%,transparent);border:1px solid color-mix(in srgb,var(--gc) 35%,transparent)}
+.grow .e .emb{width:24px;stroke-width:10}
+.grow .nm{min-width:0;display:flex;flex-direction:column}
+.grow .nm b{font-family:var(--display);font-size:1.12rem;color:var(--gc);line-height:1.2}
+.grow .nm i{font-size:.8rem;color:var(--muted)}
+.grow .fq{font-size:.78rem;color:var(--muted);white-space:nowrap}
+.grow .cur{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gc);display:block}
+.grow .chev{width:18px;height:18px}
+.grow[open] .chev{transform:rotate(180deg)}
+.grow[open] summary .e{background:var(--gc);color:var(--accent-ink);border-color:var(--gc)}
+.gbody{padding:2px 4px 16px 66px;display:flex;flex-direction:column;gap:10px}
+.gbody .pr{font-weight:700;font-size:.92rem}
+.gbody p{margin:0;font-size:.9rem;color:var(--muted);line-height:1.45}
+.gbody .btn{align-self:flex-start;background:var(--gc);color:var(--accent-ink);border:none}
+.gbody .btn[disabled]{background:transparent;color:var(--gc);border:1.5px solid var(--gc);cursor:default}
+.grow[open] .gbody{animation:gopen .35s ease both}
+@keyframes gopen{from{opacity:0;transform:translateY(-6px)}}
+@media (prefers-reduced-motion:no-preference){
+  .gods-in .rise{animation:rise .6s cubic-bezier(.2,.75,.25,1) both;animation-delay:calc(var(--i)*65ms)}
+  .gods-in .grow .e .emb *{stroke-dasharray:1200;stroke-dashoffset:1200;animation:draw 1.3s ease-out forwards;animation-delay:calc(var(--i)*65ms + 200ms)}
+  .gods-in .grow .e .emb .f{stroke-dasharray:none;opacity:0;animation:fadein .5s ease forwards;animation-delay:calc(var(--i)*65ms + 700ms)}
+}
+@keyframes rise{from{opacity:0;transform:translateY(18px) scale(.98)}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fadein{to{opacity:1}}
 
 /* Barres du bas */
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:4px 8px calc(4px + env(safe-area-inset-bottom,0px))}
@@ -936,22 +959,28 @@ function renderMusic(){
 
 /* ================= Panthéon ================= */
 function renderGods(){
-  const card=([id,g])=>`<button type="button" class="godc" data-god="${id}" aria-pressed="${id===god}" style="--gc:${g.col}"><div class="e">${emb(id)}</div><div style="min-width:0"><h3>${g.n}</h3><div class="ep">${esc(g.ep)}</div><div class="pr">${esc(g.pr)} · ${g.best} j/sem.</div><p>${esc(g.d)}</p></div></button>`;
+  let n=0;const r=()=>`class="rise" style="--i:${n++}"`;
+  const row=([id,g])=>`<details class="grow rise" name="pantheon" style="--gc:${g.col};--i:${n++}">
+      <summary><span class="e">${emb(id)}</span><span class="nm"><b>${g.n}</b><i>${esc(g.ep)}</i></span><span class="fq">${id===god?'<span class="cur">Actuel</span>':''}${g.best} j/sem.</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="gbody"><div class="pr">${esc(g.pr)}</div><p>${esc(g.d)}</p>${id===god?`<button type="button" class="btn" disabled>Programme actuel</button>`:`<button type="button" class="btn" data-god="${id}">Choisir ce programme</button>`}</div>
+    </details>`;
   const all=Object.entries(GODS),male=all.filter(([,g])=>!g.fem),fem=all.filter(([,g])=>g.fem);
   fem.sort((a,b)=>(b[0]==='psyche')-(a[0]==='psyche'));const zones=[...new Set(fem.map(([,g])=>g.zone))],shown=zoneSel?fem.filter(([,g])=>g.zone===zoneSel):fem;
-  $('#tab-gods').innerHTML=`
-    <section><span class="label">Le Panthéon</span><h2 style="margin-top:4px">Choisis ton programme</h2><p class="muted" style="margin:6px 0 0">Chaque dieu et chaque déesse a son programme. Le planning, la musique conseillée et les couleurs de l'appli changent avec ton choix.</p></section>
-    <section class="stack"><h3>Les dieux</h3><div class="gods">${male.map(card).join('')}</div></section>
-    <section class="card hero">
-      <div><span class="label">Programmes femmes</span><h2 style="margin-top:4px">Les déesses</h2><p class="muted" style="margin:6px 0 0;font-size:.9rem">Choisis la partie du corps que tu veux travailler en priorité. Chaque programme garde aussi un peu de travail global pour une silhouette équilibrée.</p></div>
+  const head=`<section ${r()}><span class="label">Le Panthéon</span><h2 style="margin-top:4px">Choisis ton programme</h2><p class="muted" style="margin:6px 0 0">Touche un dieu ou une déesse pour découvrir son programme. Le planning, la musique conseillée et les couleurs de l'appli changent avec ton choix.</p></section>`;
+  const godsCard=`<section class="card" ${r()}><h3>Les dieux</h3><div class="glist">${male.map(row).join('')}</div></section>`;
+  const femHead=`<div><span class="label">Programmes femmes</span><h2 style="margin-top:4px">Les déesses</h2><p class="muted" style="margin:6px 0 0;font-size:.9rem">Choisis la partie du corps que tu veux travailler en priorité. Chaque programme garde aussi un peu de travail global pour une silhouette équilibrée.</p></div>`;
+  const femCard=`<section class="card hero" ${r()}>${femHead}
       <div class="seg"><button type="button" data-zone="" aria-pressed="${!zoneSel}">Toutes</button>${zones.map(z=>`<button type="button" data-zone="${esc(z)}" aria-pressed="${z===zoneSel}">${esc(z)}</button>`).join('')}</div>
-      <div class="gods">${shown.map(card).join('')}</div>
-    </section>
-    <section class="card"><h3>Image de fond pour ${esc(GODS[god].n)}</h3>
+      <div class="glist">${shown.map(row).join('')}</div></section>`;
+  $('#tab-gods').innerHTML=head+godsCard+femCard+`
+    <section class="card" ${r()}><h3>Image de fond pour ${esc(GODS[god].n)}</h3>
       <p class="muted" style="margin:0;font-size:.9rem">L'appli ne peut pas charger d'images depuis Internet. Enregistre une image de ${esc(GODS[god].n)} sur ton téléphone puis ajoute-la ici : elle s'affichera en fond, assombrie pour garder le texte lisible.</p>
       <div class="actions"><button type="button" class="btn primary" id="bgAdd">Choisir une image</button><button type="button" class="btn ghost" id="bgDel" ${bgURL?'':'hidden'}>Retirer l'image</button></div>
     </section>`;
 }
+// Ouverture du Panthéon : les éléments apparaissent en escalier, puis la classe est retirée pour ne pas rejouer l'effet
+let godsT=null;
+function godsIn(){const m=$('#tab-gods');m.classList.remove('gods-in');void m.offsetWidth;m.classList.add('gods-in');clearTimeout(godsT);godsT=setTimeout(()=>m.classList.remove('gods-in'),3200)}
 
 /* ================= Muscles travaillés ================= */
 const MN={pecs:'Pectoraux',delts:'Épaules',traps:'Trapèzes',biceps:'Biceps',triceps:'Triceps',forearms:'Avant-bras',abs:'Abdominaux',obliques:'Obliques',lats:'Grand dorsal',lowback:'Lombaires',glutes:'Fessiers',quads:'Quadriceps',hams:'Ischio-jambiers',calves:'Mollets'};
@@ -1302,7 +1331,7 @@ function renderAll(){renderNav();renderTop();renderTrain();renderStats();renderF
 /* ================= Interactions ================= */
 document.addEventListener('click',e=>{
   const t=e.target;
-  const tb=t.closest('[data-tab],[data-go]');if(tb){tab=tb.dataset.tab||tb.dataset.go;store.set('pm_tab',tab);if(tab==='food')foodSel=null;renderNav();if(tab==='stats')renderStats();window.scrollTo({top:0});return}
+  const tb=t.closest('[data-tab],[data-go]');if(tb){tab=tb.dataset.tab||tb.dataset.go;store.set('pm_tab',tab);if(tab==='food')foodSel=null;renderNav();if(tab==='stats')renderStats();if(tab==='gods')godsIn();window.scrollTo({top:0});return}
   const en=t.closest('[data-en]');if(en){draft.energy=+en.dataset.en;document.querySelectorAll('[data-en]').forEach(b=>b.setAttribute('aria-pressed',b===en));return}
   if(t.closest('#hedit')){editing=true;draft=Object.assign({},H.log[dateKey]);renderTrain();return}
   if(t.closest('#hcancel')){editing=false;renderTrain();return}
@@ -1376,7 +1405,7 @@ function loop(ts){
   requestAnimationFrame(loop);
 }
 window.addEventListener('resize',layoutBars);
-renderAll();layoutBars();applyGod().then(renderGods);loadTracks();
+renderAll();layoutBars();applyGod().then(renderGods);loadTracks();if(tab==='gods')godsIn();
 requestAnimationFrame(loop);
 
 </script>
