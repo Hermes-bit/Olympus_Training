@@ -21,7 +21,7 @@ body{margin:0;font:14px system-ui,-apple-system,sans-serif}
 img{max-width:100%}
 [hidden]{display:none!important}
 </style>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caladea:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
 /* Layout : app mobile une colonne, barre d'onglets fixée en bas. Univers « vase attique » : glaçure noire, figures terre cuite, frise grecque ; la couleur d'accent suit le dieu choisi. Thème sombre unique, choisi délibérément. */
 :root{
@@ -30,16 +30,16 @@ img{max-width:100%}
   --terra:#C9683A; --god:#6FC3E8; --accent:var(--god); --accent-ink:#0F0D0B;
   --red:#E0604F; --blue:#6AA3E8; --yellow:#E8C35A; --green:#6DBF7B; --grey:#A89C8A;
   --ok:#6DBF7B; --warn:#E8B04A; --bad:#E0604F;
-  --display:"Cinzel",Georgia,"Times New Roman",serif;
-  --body:"Barlow",system-ui,-apple-system,sans-serif;
-  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --display:Cambria,"Caladea",Georgia,"Times New Roman",serif;
+  --body:Cambria,"Caladea",Georgia,"Times New Roman",serif;
+  --mono:Cambria,"Caladea",Georgia,"Times New Roman",serif;
   --navh:64px;
   --meander:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='12'%3E%3Cpath d='M0 11h22V1H6v7h11V4h-6' fill='none' stroke='%23C9683A' stroke-width='1.5'/%3E%3C/svg%3E");
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{background:var(--bg)}
-body{color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+body{color:var(--ink);font-family:var(--body);font-variant-numeric:lining-nums tabular-nums;font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent}
 button,input{font:inherit;color:inherit}
 button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid var(--god);outline-offset:2px}
 
@@ -669,7 +669,7 @@ function healthHTML(){
   const r=computeScore(e),lv=level(r.score),p=r.parts;
   return `<section class="card">
     <div class="score">
-      <svg class="dial" viewBox="0 0 84 84" role="img" aria-label="Forme ${r.score} sur 100"><circle cx="42" cy="42" r="34" fill="none" stroke="var(--line)" stroke-width="8"/><circle cx="42" cy="42" r="34" fill="none" stroke="${lv.c}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${(r.score/100*213.6).toFixed(1)} 214" transform="rotate(-90 42 42)"/><text x="42" y="48" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="20" fill="var(--ink)">${r.score}</text></svg>
+      <svg class="dial" viewBox="0 0 84 84" role="img" aria-label="Forme ${r.score} sur 100"><circle cx="42" cy="42" r="34" fill="none" stroke="var(--line)" stroke-width="8"/><circle cx="42" cy="42" r="34" fill="none" stroke="${lv.c}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${(r.score/100*213.6).toFixed(1)} 214" transform="rotate(-90 42 42)"/><text x="42" y="48" text-anchor="middle" font-family="Cambria, Caladea, Georgia, serif" font-size="20" fill="var(--ink)">${r.score}</text></svg>
       <div style="min-width:0;flex:1"><span class="label">Forme du jour</span><h2 style="margin:2px 0 4px">${lv.t}</h2><div class="muted" style="font-size:.9rem;line-height:1.35">${lv.d}</div></div>
     </div>
     <div class="metrics">
