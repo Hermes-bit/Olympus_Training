@@ -164,6 +164,8 @@ h3{font-size:1.05rem;letter-spacing:.03em}
 .kpi .k{font-size:.76rem;color:var(--muted);margin-top:2px}
 .chart{width:100%;height:auto;display:block;overflow:visible}
 .chart .ax{font:10px var(--mono);fill:var(--muted)}
+.chart .ax.day{font-size:11px;fill:color-mix(in srgb,var(--ink) 75%,var(--muted))}
+.chart .ax.mon{font:600 10px var(--body);fill:var(--ink);letter-spacing:.04em}
 .chart-read{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:-4px}
 .chart-read .v{font:600 1.6rem var(--mono);font-variant-numeric:tabular-nums;color:var(--ink)}
 .chart-read .v small{font-size:.8rem;color:var(--muted);margin-left:4px;font-weight:500}
@@ -786,16 +788,21 @@ function renderStats(){
   const sum=f=>L.reduce((a,l)=>a+(+l[f]||0),0);
   const last=L.slice(-12),maxK=Math.max(100,...last.map(l=>+l.kcal||0));
   // Dessiné à la largeur réelle de la carte pour que textes et barres gardent leur taille à l'écran
-  const nice=Math.ceil(maxK/200)*200,W=Math.max(280,Math.min(760,($('#tab-stats').clientWidth||380)-38)),Hc=150,pt=22,pl=30,pb=22;
-  const slot=(W-pl)/Math.max(last.length,1),bw=Math.min(26,slot*.56),yOf=v=>pt+Hc-v/nice*Hc,step=slot<34?2:1;
+  const nice=Math.ceil(maxK/200)*200,W=Math.max(280,Math.min(760,($('#tab-stats').clientWidth||380)-38)),Hc=150,pt=22,pl=30,pb=50;
+  const slot=(W-pl)/Math.max(last.length,1),bw=Math.min(26,slot*.56),yOf=v=>pt+Hc-v/nice*Hc;
+  // Repères de temps : jour de la semaine, mois, et une semaine sur deux grisée en fond
+  const dt=l=>{const [y,m,d]=l.date.split('-');return new Date(+y,m-1,+d)},wk=l=>{const d=dt(l);d.setDate(d.getDate()-(d.getDay()+6)%7);return d.getTime()};
+  const JOURS=['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'],MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+  const weeks=[];last.forEach((l,i)=>{const k=wk(l),g=weeks[weeks.length-1];if(g&&g.k===k)g.b=i;else weeks.push({k,a:i,b:i})});
   const best=last.length?last.reduce((a,b)=>b.p>a.p?b:a):null,id=l=>l.date+'|'+l.key;
   const cur=last.find(l=>id(l)===chartSel)||best,mean=avg(last.map(l=>+l.kcal||0));
   const bar=(x,y,w,h)=>{const r=Math.min(4,w/2,h);return `M${x},${y+h}V${y+r}Q${x},${y} ${x+r},${y}H${x+w-r}Q${x+w},${y} ${x+w},${y+r}V${y+h}Z`};
   const chart=last.length?`<div class="chart-read"><span class="v">${fr(+cur.kcal||0)}<small>kcal</small></span><span class="d">${fmtDate(cur.date)} · perf ${cur.p}${cur===best?' · <b>★ meilleure séance</b>':''}</span></div>
   <svg class="chart" viewBox="0 0 ${W} ${pt+Hc+pb}" role="img" aria-label="Calories par séance, ${last.length} dernières séances">
+    ${weeks.map((g,j)=>j%2?`<rect x="${pl+slot*g.a+1}" y="0" width="${slot*(g.b-g.a+1)-2}" height="${pt+Hc+34}" rx="6" fill="var(--surface2)" opacity=".7"/>`:'').join('')}
     ${[.5,1].map(f=>`<line x1="${pl}" x2="${W}" y1="${yOf(nice*f)}" y2="${yOf(nice*f)}" stroke="var(--line)" stroke-opacity=".6"/><text x="${pl-8}" y="${yOf(nice*f)+3.5}" text-anchor="end" class="ax">${Math.round(nice*f)}</text>`).join('')}
     ${last.map((l,i)=>{const v=+l.kcal||0,cx=pl+slot*(i+.5),y=yOf(v),h=Math.max(pt+Hc-y,2),on=l===cur,[,m,d]=l.date.split('-');
-      return `<g data-bar="${id(l)}" style="cursor:pointer"><rect x="${cx-slot/2}" y="0" width="${slot}" height="${pt+Hc+pb}" fill="transparent"/><path d="${bar(cx-bw/2,pt+Hc-h,bw,h)}" fill="${on?'var(--god)':'color-mix(in srgb,var(--god) 38%,var(--surface2))'}"/>${l===best?`<text x="${cx}" y="${pt+Hc-h-7}" text-anchor="middle" font-size="11" fill="var(--god)">★</text>`:''}${(i%step===(last.length-1)%step)||on?`<text x="${cx}" y="${pt+Hc+15}" text-anchor="middle" class="ax"${on?' fill="var(--ink)"':''}>${+d}/${+m}</text>`:''}<title>${fmtDate(l.date)} · ${v} kcal · perf ${l.p}</title></g>`}).join('')}
+      return `<g data-bar="${id(l)}" style="cursor:pointer"><rect x="${cx-slot/2}" y="0" width="${slot}" height="${pt+Hc+pb}" fill="transparent"/><path d="${bar(cx-bw/2,pt+Hc-h,bw,h)}" fill="${on?'var(--god)':'color-mix(in srgb,var(--god) 38%,var(--surface2))'}"/>${l===best?`<text x="${cx}" y="${pt+Hc-h-7}" text-anchor="middle" font-size="11" fill="var(--god)">★</text>`:''}<text x="${cx}" y="${pt+Hc+14}" text-anchor="middle" class="ax" font-size="9">${JOURS[dt(l).getDay()]}</text><text x="${cx}" y="${pt+Hc+28}" text-anchor="middle" class="ax day"${on?' fill="var(--ink)" font-weight="700"':''}>${+d}</text>${!i||last[i-1].date.slice(5,7)!==l.date.slice(5,7)?`<line x1="${cx-slot/2+1}" x2="${cx-slot/2+1}" y1="${pt+Hc+36}" y2="${pt+Hc+48}" stroke="var(--muted)" stroke-opacity=".6"/><text x="${cx-slot/2+5}" y="${pt+Hc+46}" class="ax mon">${MOIS[m-1]}</text>`:''}<title>${fmtDate(l.date)} · ${v} kcal · perf ${l.p}</title></g>`}).join('')}
     <line x1="${pl}" x2="${W}" y1="${pt+Hc}" y2="${pt+Hc}" stroke="var(--line)"/>
     <line x1="${pl}" x2="${W}" y1="${yOf(mean)}" y2="${yOf(mean)}" stroke="var(--ink)" stroke-opacity=".45" stroke-dasharray="4 4" pointer-events="none"/>
     <text x="${W}" y="${yOf(mean)-5}" text-anchor="end" class="ax" pointer-events="none">moy. ${Math.round(mean)}</text>
