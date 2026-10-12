@@ -47,6 +47,11 @@ button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible{o
 .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .bg-img{position:absolute;inset:0;background-size:cover;background-position:center top;opacity:.32}
 .bg-emb{position:absolute;right:-18%;top:4%;width:min(92vw,560px);color:var(--god);opacity:.075}
+.bg-emb{animation:float-big 22s ease-in-out infinite alternate}
+.bg-float{position:absolute;inset:0;color:var(--god)}
+.bg-float>div{position:absolute;animation:float 18s ease-in-out infinite alternate}
+@keyframes float{0%{transform:translate(0,0) rotate(-6deg)}50%{transform:translate(14px,-22px) rotate(3deg)}100%{transform:translate(-8px,-40px) rotate(7deg)}}
+@keyframes float-big{0%{transform:translateY(0) rotate(-2deg)}100%{transform:translateY(-28px) rotate(2deg)}}
 .bg-shade{position:absolute;inset:0;background:radial-gradient(110% 55% at 85% 0%,color-mix(in srgb,var(--god) 16%,transparent),transparent 62%),linear-gradient(180deg,rgba(15,13,11,.35) 0%,rgba(15,13,11,.75) 45%,var(--bg) 100%)}
 .emb{fill:none;stroke:currentColor;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;display:block;width:100%;height:auto}
 .emb .f{fill:currentColor;stroke:none}
@@ -171,7 +176,6 @@ h3{font-size:1.05rem;letter-spacing:.03em}
 .chart-read .v small{font-size:.8rem;color:var(--muted);margin-left:4px;font-weight:500}
 .chart-read .d{font-size:.84rem;color:var(--muted)}
 .chart-read .d b{color:var(--god);font-weight:600}
-.demo-note{border:1px dashed var(--warn);color:var(--warn);border-radius:12px;padding:8px 12px;font-size:.86rem}
 .glory{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
 .glory .rank{font:800 1.6rem var(--display);color:var(--god);width:30px;text-align:center}
 .glory .t{font-weight:600}
@@ -287,7 +291,7 @@ footer{font-size:.78rem;color:var(--muted);line-height:1.45}
 </style>
 </head>
 <body>
-<div class="bg" aria-hidden="true"><div class="bg-img" id="bgImg"></div><div class="bg-emb" id="bgEmb"></div><div class="bg-shade"></div></div>
+<div class="bg" aria-hidden="true"><div class="bg-img" id="bgImg"></div><div class="bg-emb" id="bgEmb"></div><div class="bg-shade"></div><div class="bg-float" id="bgFloat"></div></div>
 
 <div class="wrap">
   <header class="top" id="top"></header>
@@ -365,13 +369,13 @@ const S={
   FA:{t:'Full body A',m:['Jambes','Pectoraux','Dos'],e:[['squat',4,'6–8',150],['bench',4,'6–8',150],['row',3,'8–10',120],['latraise',3,'12–15',60],['curl',2,'10–12',60],['plank',3,'40 s',45]]},
   FB:{t:'Full body B',m:['Ischios','Épaules','Dos'],e:[['deadlift',3,'5',180],['ohp',3,'6–8',120],['pullup',3,'6–10',120],['incdb',3,'8–12',90],['legcurl',3,'10–12',60],['tri',2,'10–12',60]]},
   FC:{t:'Full body C',m:['Jambes','Pectoraux','Dos'],e:[['legpress',3,'10–12',120],['incdb',3,'8–10',90],['cablerow',3,'10–12',90],['lunge',3,'8–10 / jambe',90],['facepull',3,'15',60],['hammer',2,'10–12',60],['hangleg',3,'10–12',60]]},
-  U1:{t:'Haut du corps — force',m:['Pectoraux','Dos','Épaules'],e:[['bench',4,'5–7',150],['row',4,'6–8',120],['ohp',3,'6–8',120],['pullup',3,'6–10',120],['curl',2,'8–10',60],['tri',2,'8–10',60]]},
-  L1:{t:'Bas du corps — force',m:['Jambes','Ischios','Fessiers'],e:[['squat',4,'5–7',180],['rdl',3,'8–10',120],['legpress',3,'10',120],['legcurl',3,'10–12',60],['calf',4,'10–12',60],['plank',3,'45 s',45]]},
-  U2:{t:'Haut du corps — volume',m:['Pectoraux','Dos','Bras'],e:[['incdb',4,'8–12',90],['latpd',4,'10–12',90],['cablerow',3,'10–12',90],['latraise',4,'12–15',60],['flyes',3,'12–15',60],['hammer',3,'10–12',60],['ohtri',3,'10–12',60]]},
-  L2:{t:'Bas du corps — volume',m:['Fessiers','Jambes','Abdos'],e:[['deadlift',3,'5',180],['lunge',3,'10 / jambe',90],['hipthrust',3,'8–12',90],['legext',3,'12–15',60],['legcurl',3,'12–15',60],['calf',4,'12–15',60],['hangleg',3,'10–12',60]]},
-  PU:{t:'Push — pecs, épaules, triceps',m:['Pectoraux','Épaules','Bras'],e:[['bench',4,'6–8',150],['ohp',3,'8–10',120],['incdb',3,'10–12',90],['dips',3,'8–12',90],['latraise',4,'12–15',60],['tri',3,'10–12',60]]},
-  PL:{t:'Pull — dos, biceps',m:['Dos','Bras','Épaules'],e:[['deadlift',3,'5',180],['pullup',4,'6–10',120],['cablerow',3,'10–12',90],['facepull',3,'15',60],['curl',3,'10–12',60],['hammer',2,'10–12',60]]},
-  LG:{t:'Legs — jambes complètes',m:['Jambes','Ischios','Fessiers'],e:[['squat',4,'6–8',180],['rdl',3,'8–10',120],['legpress',3,'10–12',120],['legcurl',3,'10–12',60],['calf',4,'10–15',60],['hangleg',3,'10–12',60]]}
+  U1:{t:'Haut du corps : force',m:['Pectoraux','Dos','Épaules'],e:[['bench',4,'5–7',150],['row',4,'6–8',120],['ohp',3,'6–8',120],['pullup',3,'6–10',120],['curl',2,'8–10',60],['tri',2,'8–10',60]]},
+  L1:{t:'Bas du corps : force',m:['Jambes','Ischios','Fessiers'],e:[['squat',4,'5–7',180],['rdl',3,'8–10',120],['legpress',3,'10',120],['legcurl',3,'10–12',60],['calf',4,'10–12',60],['plank',3,'45 s',45]]},
+  U2:{t:'Haut du corps : volume',m:['Pectoraux','Dos','Bras'],e:[['incdb',4,'8–12',90],['latpd',4,'10–12',90],['cablerow',3,'10–12',90],['latraise',4,'12–15',60],['flyes',3,'12–15',60],['hammer',3,'10–12',60],['ohtri',3,'10–12',60]]},
+  L2:{t:'Bas du corps : volume',m:['Fessiers','Jambes','Abdos'],e:[['deadlift',3,'5',180],['lunge',3,'10 / jambe',90],['hipthrust',3,'8–12',90],['legext',3,'12–15',60],['legcurl',3,'12–15',60],['calf',4,'12–15',60],['hangleg',3,'10–12',60]]},
+  PU:{t:'Push : pecs, épaules, triceps',m:['Pectoraux','Épaules','Bras'],e:[['bench',4,'6–8',150],['ohp',3,'8–10',120],['incdb',3,'10–12',90],['dips',3,'8–12',90],['latraise',4,'12–15',60],['tri',3,'10–12',60]]},
+  PL:{t:'Pull : dos, biceps',m:['Dos','Bras','Épaules'],e:[['deadlift',3,'5',180],['pullup',4,'6–10',120],['cablerow',3,'10–12',90],['facepull',3,'15',60],['curl',3,'10–12',60],['hammer',2,'10–12',60]]},
+  LG:{t:'Legs : jambes complètes',m:['Jambes','Ischios','Fessiers'],e:[['squat',4,'6–8',180],['rdl',3,'8–10',120],['legpress',3,'10–12',120],['legcurl',3,'10–12',60],['calf',4,'10–15',60],['hangleg',3,'10–12',60]]}
 };
 
 /* ---------- Démos animées (figure articulée) ---------- */
@@ -526,24 +530,24 @@ Object.assign(ANIM,{
 /* ================= Séances par dieu ================= */
 ['FA','FB','FC','U1','L1','PU','PL','LG'].forEach(k=>S[k].mix='lourd');['U2','L2'].forEach(k=>S[k].mix='energie');
 Object.assign(S,{
-  H1:{t:'Ailes — puissance du haut',mix:'lourd',m:['Pectoraux','Dos','Épaules'],e:[['bench',4,'5',150],['pullup',4,'6–8',120],['ohp',3,'6',120],['row',3,'8',90],['facepull',3,'15',60],['plank',3,'40 s',45]]},
-  H2:{t:'Talonnières — vitesse des jambes',mix:'lourd',m:['Jambes','Ischios','Fessiers'],e:[['jumpsquat',4,'5',90],['squat',4,'5',180],['rdl',3,'8',120],['lunge',3,'8 / jambe',90],['calf',4,'12',60],['sprint',6,'20 s',90]]},
-  H3:{t:'Caducée — hypertrophie athlétique',mix:'energie',m:['Pectoraux','Dos','Bras'],e:[['incdb',4,'8–12',90],['latpd',4,'10–12',90],['latraise',4,'15',60],['dips',3,'10',90],['curl',3,'12',60],['tri',3,'12',60]]},
-  H4:{t:"Course d'Olympie — conditionnement",mix:'energie',m:['Fessiers','Abdos','Jambes'],e:[['kbswing',5,'15',60],['boxjump',4,'5',90],['farmer',4,'40 s',60],['rower',6,'30 s',60],['burpee',4,'10',60],['hangleg',3,'12',60]]},
-  Z1:{t:'Foudre — squat lourd',mix:'lourd',m:['Jambes','Pectoraux','Dos'],e:[['squat',5,'5',180],['bench',5,'5',180],['row',5,'5',120],['plank',3,'45 s',45]]},
-  Z2:{t:'Égide — soulevé lourd',mix:'lourd',m:['Dos','Épaules','Ischios'],e:[['deadlift',5,'3',210],['ohp',5,'5',150],['pullup',4,'6',120],['farmer',3,'40 s',90]]},
-  Z3:{t:'Olympe — développé lourd',mix:'lourd',m:['Pectoraux','Jambes','Bras'],e:[['bench',5,'3',210],['squat',3,'5',180],['incdb',3,'8',90],['latpd',3,'10',90],['tri',3,'10',60]]},
-  A1:{t:'Lyre — épaules et bras',mix:'energie',m:['Épaules','Bras'],e:[['ohp',4,'8–10',120],['latraise',5,'12–15',60],['facepull',3,'15',60],['curl',4,'10–12',60],['hammer',3,'12',60],['tri',4,'10–12',60],['ohtri',3,'12',60]]},
-  A2:{t:'Char du Soleil — dos en V',mix:'energie',m:['Dos','Épaules'],e:[['pullup',4,'8–10',120],['latpd',4,'10–12',90],['cablerow',4,'10–12',90],['row',3,'8–10',90],['facepull',3,'15',60]]},
-  A3:{t:'Laurier — pectoraux sculptés',mix:'energie',m:['Pectoraux','Épaules'],e:[['incdb',4,'8–10',120],['bench',3,'8–10',120],['flyes',4,'12–15',60],['dips',3,'10–12',90],['latraise',4,'15',60]]},
-  A4:{t:'Delphes — jambes dessinées',mix:'energie',m:['Jambes','Ischios','Abdos'],e:[['squat',4,'8–10',150],['legpress',3,'12',120],['legext',3,'15',60],['legcurl',4,'12',60],['calf',4,'15',60],['hangleg',3,'12',60]]},
-  T1:{t:'Arc — circuit du haut',mix:'energie',m:['Pectoraux','Dos','Bras'],e:[['bench',3,'12',45],['row',3,'12',45],['ohp',3,'12',45],['curl',3,'15',45],['tri',3,'15',45]]},
-  T2:{t:'Forêt — circuit du bas',mix:'energie',m:['Jambes','Fessiers'],e:[['legpress',3,'15',45],['lunge',3,'12 / jambe',45],['hipthrust',3,'15',45],['legcurl',3,'15',45],['kbswing',3,'20',45]]},
-  T3:{t:'Chasse — cardio et tronc',mix:'energie',m:['Abdos','Jambes'],e:[['sprint',8,'20 s',60],['rower',5,'1 min',60],['burpee',4,'12',45],['jumprope',5,'1 min',45],['plank',3,'1 min',45],['hangleg',3,'15',45]]},
-  P1:{t:'Tremblement — jambes',mix:'lourd',m:['Jambes','Ischios'],e:[['squat',4,'6',180],['rdl',4,'8',120],['lunge',3,'10 / jambe',90],['calf',4,'12',60],['plank',3,'1 min',45]]},
-  P2:{t:'Trident — force du haut',mix:'lourd',m:['Épaules','Dos','Pectoraux'],e:[['ohp',4,'6',150],['pullup',4,'6–8',120],['row',3,'8',90],['dips',3,'8–10',90],['farmer',3,'40 s',90]]},
-  P3:{t:'Marée — chaîne arrière',mix:'lourd',m:['Fessiers','Ischios','Dos'],e:[['deadlift',4,'4',210],['hipthrust',4,'8',120],['legpress',3,'10',120],['kbswing',3,'15',60],['hangleg',3,'12',60]]},
-  P4:{t:'Vague — volume du haut',mix:'energie',m:['Pectoraux','Dos'],e:[['bench',4,'8',120],['latpd',4,'10',90],['incdb',3,'10',90],['cablerow',3,'12',90],['facepull',3,'15',60]]}
+  H1:{t:'Ailes : puissance du haut',mix:'lourd',m:['Pectoraux','Dos','Épaules'],e:[['bench',4,'5',150],['pullup',4,'6–8',120],['ohp',3,'6',120],['row',3,'8',90],['facepull',3,'15',60],['plank',3,'40 s',45]]},
+  H2:{t:'Talonnières : vitesse des jambes',mix:'lourd',m:['Jambes','Ischios','Fessiers'],e:[['jumpsquat',4,'5',90],['squat',4,'5',180],['rdl',3,'8',120],['lunge',3,'8 / jambe',90],['calf',4,'12',60],['sprint',6,'20 s',90]]},
+  H3:{t:'Caducée : hypertrophie athlétique',mix:'energie',m:['Pectoraux','Dos','Bras'],e:[['incdb',4,'8–12',90],['latpd',4,'10–12',90],['latraise',4,'15',60],['dips',3,'10',90],['curl',3,'12',60],['tri',3,'12',60]]},
+  H4:{t:"Course d'Olympie : conditionnement",mix:'energie',m:['Fessiers','Abdos','Jambes'],e:[['kbswing',5,'15',60],['boxjump',4,'5',90],['farmer',4,'40 s',60],['rower',6,'30 s',60],['burpee',4,'10',60],['hangleg',3,'12',60]]},
+  Z1:{t:'Foudre : squat lourd',mix:'lourd',m:['Jambes','Pectoraux','Dos'],e:[['squat',5,'5',180],['bench',5,'5',180],['row',5,'5',120],['plank',3,'45 s',45]]},
+  Z2:{t:'Égide : soulevé lourd',mix:'lourd',m:['Dos','Épaules','Ischios'],e:[['deadlift',5,'3',210],['ohp',5,'5',150],['pullup',4,'6',120],['farmer',3,'40 s',90]]},
+  Z3:{t:'Olympe : développé lourd',mix:'lourd',m:['Pectoraux','Jambes','Bras'],e:[['bench',5,'3',210],['squat',3,'5',180],['incdb',3,'8',90],['latpd',3,'10',90],['tri',3,'10',60]]},
+  A1:{t:'Lyre : épaules et bras',mix:'energie',m:['Épaules','Bras'],e:[['ohp',4,'8–10',120],['latraise',5,'12–15',60],['facepull',3,'15',60],['curl',4,'10–12',60],['hammer',3,'12',60],['tri',4,'10–12',60],['ohtri',3,'12',60]]},
+  A2:{t:'Char du Soleil : dos en V',mix:'energie',m:['Dos','Épaules'],e:[['pullup',4,'8–10',120],['latpd',4,'10–12',90],['cablerow',4,'10–12',90],['row',3,'8–10',90],['facepull',3,'15',60]]},
+  A3:{t:'Laurier : pectoraux sculptés',mix:'energie',m:['Pectoraux','Épaules'],e:[['incdb',4,'8–10',120],['bench',3,'8–10',120],['flyes',4,'12–15',60],['dips',3,'10–12',90],['latraise',4,'15',60]]},
+  A4:{t:'Delphes : jambes dessinées',mix:'energie',m:['Jambes','Ischios','Abdos'],e:[['squat',4,'8–10',150],['legpress',3,'12',120],['legext',3,'15',60],['legcurl',4,'12',60],['calf',4,'15',60],['hangleg',3,'12',60]]},
+  T1:{t:'Arc : circuit du haut',mix:'energie',m:['Pectoraux','Dos','Bras'],e:[['bench',3,'12',45],['row',3,'12',45],['ohp',3,'12',45],['curl',3,'15',45],['tri',3,'15',45]]},
+  T2:{t:'Forêt : circuit du bas',mix:'energie',m:['Jambes','Fessiers'],e:[['legpress',3,'15',45],['lunge',3,'12 / jambe',45],['hipthrust',3,'15',45],['legcurl',3,'15',45],['kbswing',3,'20',45]]},
+  T3:{t:'Chasse : cardio et tronc',mix:'energie',m:['Abdos','Jambes'],e:[['sprint',8,'20 s',60],['rower',5,'1 min',60],['burpee',4,'12',45],['jumprope',5,'1 min',45],['plank',3,'1 min',45],['hangleg',3,'15',45]]},
+  P1:{t:'Tremblement : jambes',mix:'lourd',m:['Jambes','Ischios'],e:[['squat',4,'6',180],['rdl',4,'8',120],['lunge',3,'10 / jambe',90],['calf',4,'12',60],['plank',3,'1 min',45]]},
+  P2:{t:'Trident : force du haut',mix:'lourd',m:['Épaules','Dos','Pectoraux'],e:[['ohp',4,'6',150],['pullup',4,'6–8',120],['row',3,'8',90],['dips',3,'8–10',90],['farmer',3,'40 s',90]]},
+  P3:{t:'Marée : chaîne arrière',mix:'lourd',m:['Fessiers','Ischios','Dos'],e:[['deadlift',4,'4',210],['hipthrust',4,'8',120],['legpress',3,'10',120],['kbswing',3,'15',60],['hangleg',3,'12',60]]},
+  P4:{t:'Vague : volume du haut',mix:'energie',m:['Pectoraux','Dos'],e:[['bench',4,'8',120],['latpd',4,'10',90],['incdb',3,'10',90],['cablerow',3,'12',90],['facepull',3,'15',60]]}
 });
 const SHORT={H1:'Ailes',H2:'Talons',H3:'Caducée',H4:'Course',Z1:'Foudre',Z2:'Égide',Z3:'Olympe',A1:'Lyre',A2:'Soleil',A3:'Laurier',A4:'Delphes',T1:'Arc',T2:'Forêt',T3:'Chasse',P1:'Séisme',P2:'Trident',P3:'Marée',P4:'Vague',FA:'Full A',FB:'Full B',FC:'Full C',U1:'Haut',L1:'Bas',U2:'Haut 2',L2:'Bas 2',PU:'Push',PL:'Pull',LG:'Legs'};
 const GODS={
@@ -615,6 +619,9 @@ async function applyGod(){
   const g=GODS[god];
   document.documentElement.style.setProperty('--god',g.col);
   $('#bgEmb').innerHTML=emb(god);
+  // Petits emblèmes qui dérivent lentement en fond : [gauche %, haut %, taille px, durée s, décalage s, opacité]
+  $('#bgFloat').innerHTML=[[6,58,86,19,-3,.11],[70,72,118,24,-8,.08],[14,16,58,17,-5,.12],[84,38,66,21,-12,.1],[40,88,76,26,-2,.08],[52,26,46,16,-9,.09]]
+    .map(([x,y,w,d,dl,o])=>`<div style="left:${x}%;top:${y}%;width:${w}px;opacity:${o};animation-duration:${d}s;animation-delay:${dl}s">${emb(god)}</div>`).join('');
   const blob=await IDB.get('bg_'+god);
   if(bgURL){URL.revokeObjectURL(bgURL);bgURL=null}
   if(blob){bgURL=URL.createObjectURL(blob);$('#bgImg').style.backgroundImage=`url("${bgURL}")`}else $('#bgImg').style.backgroundImage='';
@@ -689,7 +696,7 @@ function renderTrain(){
   const keep={};document.querySelectorAll('#tab-train video[data-v]').forEach(v=>{v.remove();keep[v.dataset.v]=v});
   const P=plan(),k=P[sel],when=sel===todayIdx?"Aujourd'hui":DAYS_FULL[sel];
   const loggedDays=new Set(LOG.map(l=>l.date));
-  const weekHTML=P.map((kk,i)=>{const s=kk&&S[kk];const short=s?(SHORT[kk]||s.t.split(' — ')[0]):'Repos';const dk=(()=>{const d=new Date(now);d.setDate(now.getDate()+(i-todayIdx));return iso(d)})();
+  const weekHTML=P.map((kk,i)=>{const s=kk&&S[kk];const short=s?(SHORT[kk]||s.t.split(' : ')[0]):'Repos';const dk=(()=>{const d=new Date(now);d.setDate(now.getDate()+(i-todayIdx));return iso(d)})();
     return `<button type="button" class="wd ${s?'':'rest'} ${i===todayIdx?'today':''}" aria-pressed="${i===sel}" data-d="${i}"><div class="d">${DAYS[i]}</div><div class="t">${esc(short)}</div><span class="pip ${loggedDays.has(dk)?'on':''}"></span></button>`}).join('');
   const open=[...document.querySelectorAll('#tab-train .ex')].map(x=>x.open);
   let sessHTML;
@@ -720,7 +727,7 @@ function renderTrain(){
             <div class="good"><span class="label" style="color:var(--ok)">✓ Bien l'exécuter</span><ul>${x.c.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></div>
             <div><span class="label" style="color:var(--bad)">✗ À éviter</span><ul class="avoid">${x.a.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></div>
             ${x.alt?`<div class="muted" style="font-size:.88rem">${esc(x.alt)}</div>`:''}
-            <div class="logrow">${timed?'':`<div class="field"><label for="kg-${id}">Charge (kg)</label><input id="kg-${id}" data-kg="${id}" type="number" step="0.5" min="0" inputmode="decimal" placeholder="—" value="${loads[id]??''}"></div>`}
+            <div class="logrow">${timed?'':`<div class="field"><label for="kg-${id}">Charge (kg)</label><input id="kg-${id}" data-kg="${id}" type="number" step="0.5" min="0" inputmode="decimal" placeholder="0" value="${loads[id]??''}"></div>`}
               <div style="min-width:0"><span class="label">Coche tes séries</span><div class="sets" style="margin-top:6px">${Array.from({length:n},(_,j)=>`<button type="button" class="set ${st[j]?'on':''}" data-k="${k+id}" data-j="${j}" data-n="${n}" data-r="${rest}" aria-label="Série ${j+1}">${j+1}</button>`).join('')}</div></div></div>
             <div class="actions"><a class="btn ghost" href="https://www.youtube.com/results?search_query=${encodeURIComponent(x.q)}" target="_blank" rel="noopener">${icon.play} Vidéo filmée (YouTube)</a>${(()=>{const c=cands(S[k].e[i][0]);return c.l.length>1?`<button type="button" class="btn ghost" data-swap="${k}|${i}">↻ Autre variante · ${c.l.indexOf(id)+1}/${c.l.length}</button>`:''})()}</div>
             <div class="stack" style="gap:8px"><span class="label">Ma vidéo de référence</span><div class="vbox stack" style="gap:8px" data-vbox="${id}">${vidHTML(id)}</div></div>
@@ -757,7 +764,7 @@ function finishFormHTML(dn,total){
 function finishedHTML(l){
   const p=perf(l,LOG);
   return `<section class="card"><div class="prfx"><div class="medal">${p}</div><div><span class="label">Séance enregistrée · score de performance</span><h2 style="margin-top:2px">${p>=80?'Digne de l\'Olympe':p>=60?'Belle séance':'Séance validée'}</h2></div></div>
-    <div class="metrics"><div class="metric"><div class="v">${l.dur} min</div><div class="k">Durée</div></div><div class="metric"><div class="v">${l.kcal||'—'}</div><div class="k">kcal actives</div></div><div class="metric"><div class="v">${l.hrAvg||'—'}</div><div class="k">FC moyenne</div></div><div class="metric"><div class="v">${fr(l.vol/1000,1)} t</div><div class="k">Volume soulevé</div></div></div>
+    <div class="metrics"><div class="metric"><div class="v">${l.dur} min</div><div class="k">Durée</div></div><div class="metric"><div class="v">${l.kcal||0}</div><div class="k">kcal actives</div></div><div class="metric"><div class="v">${l.hrAvg||0}</div><div class="k">FC moyenne</div></div><div class="metric"><div class="v">${fr(l.vol/1000,1)} t</div><div class="k">Volume soulevé</div></div></div>
     <div class="actions"><button class="btn ghost" type="button" data-go="stats">Voir mes statistiques</button><button class="btn ghost" type="button" id="reopen">Modifier</button></div></section>`;
 }
 
@@ -770,18 +777,8 @@ function perf(l,all){
   const a=40*comp, b=akpm&&kpm?30*Math.min(kpm/akpm,1.3)/1.3:15, c=avol&&l.vol?30*Math.min(l.vol/avol,1.3)/1.3:15;
   return Math.round(a+b+c);
 }
-function demoLog(){
-  const P=plan().filter(Boolean),out=[];let seed=7;const rnd=()=>(seed=(seed*9301+49297)%233280)/233280;
-  const d=new Date(now);d.setDate(d.getDate()-27);let i=0;
-  while(d<now){const wd=(d.getDay()+6)%7;const k=plan()[wd];
-    if(k){const sleep=5.5+rnd()*3,good=(sleep-5.5)/3;const base=S[k].e.reduce((a,[id,n,r])=>a+n*repsMid(r)*(id==='squat'||id==='deadlift'?90:id==='bench'?65:35),0);
-      const tot=S[k].e.reduce((a,e)=>a+e[1],0);
-      out.push({date:iso(d),key:k,title:S[k].t,dur:Math.round(55+rnd()*25),kcal:Math.round(320+good*220+rnd()*80),hrAvg:Math.round(118+good*14+rnd()*8),hrMax:Math.round(160+rnd()*20),sets:Math.max(tot-2,Math.round(tot*(.75+good*.25))),setsTotal:tot,vol:Math.round(base*(.85+good*.25)*(1+i*.01)),sleep:+sleep.toFixed(1),morning:Math.round(45+good*45+rnd()*8),loads:{squat:80+i,bench:60+i*.5,deadlift:100+i,ohp:40+i*.3},demo:1});i++}
-    d.setDate(d.getDate()+1)}
-  return out;
-}
 function renderStats(){
-  const real=LOG.length>0,all=(real?LOG:demoLog()).slice().sort((a,b)=>a.date<b.date?-1:1);
+  const all=LOG.slice().sort((a,b)=>a.date<b.date?-1:1);
   const cut=period==='all'?'0000':(()=>{const d=new Date(now);d.setDate(d.getDate()-(+period)+1);return iso(d)})();
   const L=all.filter(l=>l.date>=cut);
   L.forEach(l=>l.p=perf(l,all));
@@ -820,7 +817,6 @@ function renderStats(){
   $('#tab-stats').innerHTML=`
     <section class="shead"><div><span class="label">Tes statistiques</span><h2 style="margin-top:4px">Chroniques de l'Olympe</h2></div>
       <div class="seg">${[['7','7 j'],['30','30 j'],['all','Tout']].map(([k,t])=>`<button type="button" data-per="${k}" aria-pressed="${k===period}">${t}</button>`).join('')}</div></section>
-    ${real?'':`<div class="demo-note">Exemple : ces chiffres sont fictifs. Ils seront remplacés par tes vraies séances dès que tu en auras enregistré une (bas de l'onglet Séance).</div>`}
     <section class="kpis">
       <div class="kpi"><div class="v">${L.length}</div><div class="k">Séances</div></div>
       <div class="kpi"><div class="v">${fr(sum('kcal'))}<small>kcal</small></div><div class="k">Calories brûlées</div></div>
@@ -829,7 +825,7 @@ function renderStats(){
     </section>
     <section class="card"><div class="shead"><h3>Calories par séance</h3><span class="muted" style="font-size:.78rem">Touche une barre pour le détail</span></div>${chart}</section>
     <section class="card"><h3>Tes jours de gloire</h3>
-      ${top.map((l,i)=>`<div class="glory"><span class="rank">${['I','II','III'][i]}</span><div style="min-width:0"><div class="t">${esc(l.title)}</div><div class="d">${fmtDate(l.date)} · ${l.dur} min · ${l.kcal} kcal · FC ${l.hrAvg||'—'} · ${fr(l.vol/1000,1)} t${l.sleep?` · nuit de ${fr(l.sleep,1)} h`:''}</div></div><span class="pscore" style="color:var(--god);border-color:var(--god)">${l.p}</span></div>`).join('')||'<p class="muted">Enregistre ta première séance pour voir apparaître tes meilleurs jours.</p>'}
+      ${top.map((l,i)=>`<div class="glory"><span class="rank">${['I','II','III'][i]}</span><div style="min-width:0"><div class="t">${esc(l.title)}</div><div class="d">${fmtDate(l.date)} · ${l.dur} min · ${l.kcal} kcal · FC ${l.hrAvg||0} · ${fr(l.vol/1000,1)} t${l.sleep?` · nuit de ${fr(l.sleep,1)} h`:''}</div></div><span class="pscore" style="color:var(--god);border-color:var(--god)">${l.p}</span></div>`).join('')||'<p class="muted">Enregistre ta première séance pour voir apparaître tes meilleurs jours.</p>'}
     </section>
     <section class="card"><h3>Ce qui te rend performant</h3>
       ${ins.length?ins.map(x=>`<div class="insight"><span class="big">${x.big}</span><span style="font-size:.9rem">${x.t}</span></div>`).join(''):'<p class="muted" style="margin:0">Il faut au moins 4 séances avec la forme du jour remplie pour comparer.</p>'}
@@ -866,7 +862,7 @@ function renderFood(){
     <section class="card hero"><div class="prfx"><div class="medal">${st}</div><div><span class="label">Discipline</span><h2 style="margin-top:2px">${st>=7?'Volonté de titan':st>=3?'Tu tiens la cadence':'Jour'+(st===1?'':'s')+' parfait'+(st===1?'':'s')+' d\'affilée'}</h2><div class="muted" style="font-size:.88rem">Un jour compte quand les 4 repas sont cochés.</div></div></div></section>
     <section class="stack"><span class="label">Choisis le jour</span><div class="daychips">${DAYS.map((n,i)=>`<button type="button" data-fd="${i}" aria-pressed="${i===d}" class="${isTrain(i)?'train':''}">${n}</button>`).join('')}</div></section>
     <section class="card">
-      <div><span class="label">${isToday?"Aujourd'hui":DAYS_FULL[d]} · ${tr?'entraînement · '+esc(sess.split(' — ')[0]):'repos'}</span><h2 style="margin-top:4px">${esc(m.nom)}</h2></div>
+      <div><span class="label">${isToday?"Aujourd'hui":DAYS_FULL[d]} · ${tr?'entraînement · '+esc(sess.split(' : ')[0]):'repos'}</span><h2 style="margin-top:4px">${esc(m.nom)}</h2></div>
       <div class="metrics">
         <div class="metric"><div class="v">${Math.round(m.tot.k)}</div><div class="k">kcal</div></div>
         <div class="metric"><div class="v">${Math.round(m.tot.p)} g</div><div class="k">Protéines</div></div>
@@ -1062,18 +1058,18 @@ Object.assign(ANIM,{
 mu('kickback','glutes','hams');mu('stepup','quads glutes','hams calves');
 
 Object.assign(S,{
-  AF1:{t:'Galbe — fessiers force',mix:'energie',m:['Fessiers','Ischios'],e:[['hipthrust',4,'8–10',120],['rdl',3,'10',120],['lunge',3,'10 / jambe',90],['kickback',3,'12 / jambe',60],['plank',3,'40 s',45]]},
-  AF2:{t:'Rose — fessiers et jambes',mix:'energie',m:['Fessiers','Jambes'],e:[['squat',4,'8–10',120],['stepup',3,'10 / jambe',90],['legcurl',3,'12',60],['hipthrust',3,'12',90],['kbswing',3,'15',60]]},
-  AF3:{t:'Ceinture — haut du corps et gainage',mix:'energie',m:['Dos','Épaules','Abdos'],e:[['latpd',3,'10–12',90],['incdb',3,'10',90],['cablerow',3,'12',90],['latraise',3,'15',60],['plank',3,'40 s',45],['hangleg',3,'12',60]]},
-  DM1:{t:'Moisson — quadriceps',mix:'energie',m:['Jambes','Fessiers'],e:[['squat',4,'8–10',150],['legpress',3,'12',120],['stepup',3,'10 / jambe',90],['legext',3,'15',60],['calf',3,'15',60]]},
-  DM2:{t:'Épi — ischios et arrière des cuisses',mix:'energie',m:['Ischios','Fessiers'],e:[['rdl',4,'8–10',120],['legcurl',4,'12',60],['lunge',3,'10 / jambe',90],['hipthrust',3,'10',90],['kickback',3,'15 / jambe',60]]},
-  NK1:{t:'Victoire — gainage et force',mix:'energie',m:['Abdos','Fessiers'],e:[['kbswing',4,'15',60],['farmer',4,'40 s',60],['plank',4,'45 s',45],['hangleg',3,'12',60],['abcrunch',3,'15',45]]},
-  NK2:{t:'Couronne — cardio et tronc',mix:'energie',m:['Abdos','Jambes'],e:[['jumprope',5,'1 min',45],['burpee',4,'10',60],['rower',5,'1 min',60],['plank',3,'45 s',45],['hangleg',3,'12',45]]},
-  IR1:{t:'Arc-en-ciel — bras toniques',mix:'energie',m:['Bras','Épaules'],e:[['curl',3,'12',60],['hammer',3,'12',60],['tri',3,'12–15',60],['ohtri',3,'12',60],['latraise',3,'15',60],['facepull',3,'15',60]]},
-  IR2:{t:'Messagère — dos et posture',mix:'energie',m:['Dos','Épaules'],e:[['latpd',4,'10–12',90],['cablerow',3,'12',90],['row',3,'10',90],['facepull',3,'15',60],['plank',3,'40 s',45]]},
-  HR1:{t:'Diadème — corps complet A',mix:'energie',m:['Jambes','Dos','Pectoraux'],e:[['squat',3,'10',120],['latpd',3,'10–12',90],['hipthrust',3,'10',90],['incdb',3,'10',90],['cablerow',3,'12',90],['plank',3,'40 s',45]]},
-  HR2:{t:'Paon — corps complet B',mix:'energie',m:['Ischios','Épaules','Fessiers'],e:[['rdl',3,'10',120],['ohp',3,'10',90],['lunge',3,'10 / jambe',90],['row',3,'10',90],['kickback',3,'12 / jambe',60],['hangleg',3,'12',60]]},
-  HR3:{t:'Olympienne — corps complet C',mix:'energie',m:['Jambes','Pectoraux','Épaules'],e:[['legpress',3,'12',120],['stepup',3,'10 / jambe',90],['flyes',3,'12',60],['latpd',3,'12',90],['latraise',3,'15',60],['jumprope',4,'1 min',45]]}
+  AF1:{t:'Galbe : fessiers force',mix:'energie',m:['Fessiers','Ischios'],e:[['hipthrust',4,'8–10',120],['rdl',3,'10',120],['lunge',3,'10 / jambe',90],['kickback',3,'12 / jambe',60],['plank',3,'40 s',45]]},
+  AF2:{t:'Rose : fessiers et jambes',mix:'energie',m:['Fessiers','Jambes'],e:[['squat',4,'8–10',120],['stepup',3,'10 / jambe',90],['legcurl',3,'12',60],['hipthrust',3,'12',90],['kbswing',3,'15',60]]},
+  AF3:{t:'Ceinture : haut du corps et gainage',mix:'energie',m:['Dos','Épaules','Abdos'],e:[['latpd',3,'10–12',90],['incdb',3,'10',90],['cablerow',3,'12',90],['latraise',3,'15',60],['plank',3,'40 s',45],['hangleg',3,'12',60]]},
+  DM1:{t:'Moisson : quadriceps',mix:'energie',m:['Jambes','Fessiers'],e:[['squat',4,'8–10',150],['legpress',3,'12',120],['stepup',3,'10 / jambe',90],['legext',3,'15',60],['calf',3,'15',60]]},
+  DM2:{t:'Épi : ischios et arrière des cuisses',mix:'energie',m:['Ischios','Fessiers'],e:[['rdl',4,'8–10',120],['legcurl',4,'12',60],['lunge',3,'10 / jambe',90],['hipthrust',3,'10',90],['kickback',3,'15 / jambe',60]]},
+  NK1:{t:'Victoire : gainage et force',mix:'energie',m:['Abdos','Fessiers'],e:[['kbswing',4,'15',60],['farmer',4,'40 s',60],['plank',4,'45 s',45],['hangleg',3,'12',60],['abcrunch',3,'15',45]]},
+  NK2:{t:'Couronne : cardio et tronc',mix:'energie',m:['Abdos','Jambes'],e:[['jumprope',5,'1 min',45],['burpee',4,'10',60],['rower',5,'1 min',60],['plank',3,'45 s',45],['hangleg',3,'12',45]]},
+  IR1:{t:'Arc-en-ciel : bras toniques',mix:'energie',m:['Bras','Épaules'],e:[['curl',3,'12',60],['hammer',3,'12',60],['tri',3,'12–15',60],['ohtri',3,'12',60],['latraise',3,'15',60],['facepull',3,'15',60]]},
+  IR2:{t:'Messagère : dos et posture',mix:'energie',m:['Dos','Épaules'],e:[['latpd',4,'10–12',90],['cablerow',3,'12',90],['row',3,'10',90],['facepull',3,'15',60],['plank',3,'40 s',45]]},
+  HR1:{t:'Diadème : corps complet A',mix:'energie',m:['Jambes','Dos','Pectoraux'],e:[['squat',3,'10',120],['latpd',3,'10–12',90],['hipthrust',3,'10',90],['incdb',3,'10',90],['cablerow',3,'12',90],['plank',3,'40 s',45]]},
+  HR2:{t:'Paon : corps complet B',mix:'energie',m:['Ischios','Épaules','Fessiers'],e:[['rdl',3,'10',120],['ohp',3,'10',90],['lunge',3,'10 / jambe',90],['row',3,'10',90],['kickback',3,'12 / jambe',60],['hangleg',3,'12',60]]},
+  HR3:{t:'Olympienne : corps complet C',mix:'energie',m:['Jambes','Pectoraux','Épaules'],e:[['legpress',3,'12',120],['stepup',3,'10 / jambe',90],['flyes',3,'12',60],['latpd',3,'12',90],['latraise',3,'15',60],['jumprope',4,'1 min',45]]}
 });
 Object.assign(SHORT,{AF1:'Galbe',AF2:'Rose',AF3:'Ceinture',DM1:'Moisson',DM2:'Épi',NK1:'Victoire',NK2:'Couronne',IR1:'Bras',IR2:'Dos',HR1:'Diadème',HR2:'Paon',HR3:'Olymp.'});
 Object.assign(GODS,{
@@ -1206,8 +1202,8 @@ ANIM.abduct={front:1,seat:1,kneepad:1,A:{a:12,e:0,fz:1,lg:4,seat:1},B:{a:12,e:0,
 mu('abduct','glutes','');
 S.AF1.e.splice(4,0,['abduct',3,'15',60]);
 Object.assign(S,{
-  PS1:{t:'Sablier — fessiers et abducteurs',mix:'energie',m:['Fessiers','Ischios'],e:[['hipthrust',4,'8–10',120],['rdl',3,'10',120],['abduct',3,'15',60],['kickback',3,'12 / jambe',60],['lunge',3,'10 / jambe',90]]},
-  PS2:{t:'Épaules et taille — haut du corps',mix:'energie',m:['Dos','Épaules','Bras'],e:[['latpd',4,'10–12',90],['ohp',3,'10',90],['latraise',4,'15',60],['cablerow',3,'12',90],['tri',3,'12',60],['plank',3,'45 s',45]]},
+  PS1:{t:'Sablier : fessiers et abducteurs',mix:'energie',m:['Fessiers','Ischios'],e:[['hipthrust',4,'8–10',120],['rdl',3,'10',120],['abduct',3,'15',60],['kickback',3,'12 / jambe',60],['lunge',3,'10 / jambe',90]]},
+  PS2:{t:'Épaules et taille : haut du corps',mix:'energie',m:['Dos','Épaules','Bras'],e:[['latpd',4,'10–12',90],['ohp',3,'10',90],['latraise',4,'15',60],['cablerow',3,'12',90],['tri',3,'12',60],['plank',3,'45 s',45]]},
   PS3:{t:'Jambes et ventre',mix:'energie',m:['Jambes','Abdos'],e:[['squat',4,'8–10',150],['stepup',3,'10 / jambe',90],['legcurl',3,'12',60],['hangleg',3,'12',60],['abcrunch',3,'15',45]]},
   PS4:{t:'Fessiers et cardio taille',mix:'energie',m:['Fessiers','Abdos'],e:[['hipthrust',3,'12',90],['abduct',3,'20',60],['kbswing',4,'15',60],['jumprope',5,'1 min',45],['plank',3,'45 s',45]]}
 });
