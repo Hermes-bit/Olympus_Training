@@ -1,6 +1,6 @@
 // Service worker : permet d'ouvrir l'appli hors connexion.
 // Change ce numéro à chaque mise à jour de l'appli pour forcer le rafraîchissement.
-const VERSION = 'olympe-v1';
+const VERSION = 'olympe-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
